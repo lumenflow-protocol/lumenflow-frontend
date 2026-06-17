@@ -1,360 +1,167 @@
-import React from 'react'
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import Link from 'next/link'
-import { Navbar } from '../components/organisms'
+import Head from 'next/head';
+import Link from 'next/link';
 
-const CATEGORIES = [
-  { icon: '👜', name: 'Handbags',     count: '240+ items' },
-  { icon: '👟', name: 'Sneakers',     count: '180+ items' },
-  { icon: '⌚', name: 'Watches',      count: '95+ items'  },
-  { icon: '💍', name: 'Jewellery',    count: '310+ items' },
-  { icon: '🕶️', name: 'Accessories', count: '420+ items' },
-  { icon: '👗', name: 'Apparel',      count: '560+ items' },
-]
-
-const PRODUCTS = [
+const FEATURES = [
   {
-    name: 'Stella Tote Bag',
-    price: '120 XLM',
-    usd: '~$48',
-    tag: 'Best Seller',
-    color: 'bg-amber-50 dark:bg-amber-950/30',
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+    title: 'Real-time streaming',
+    desc: 'Tokens drip per second directly on-chain. No batches, no delays.',
   },
   {
-    name: 'Arc Runner Pro',
-    price: '200 XLM',
-    usd: '~$80',
-    tag: 'New Arrival',
-    color: 'bg-blue-50 dark:bg-blue-950/30',
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+      </svg>
+    ),
+    title: 'Non-custodial',
+    desc: 'Funds locked in a Soroban contract. No one can touch them except the rules.',
   },
   {
-    name: 'Horizon Watch',
-    price: '850 XLM',
-    usd: '~$340',
-    tag: 'Limited',
-    color: 'bg-slate-50 dark:bg-slate-900/50',
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+      </svg>
+    ),
+    title: 'Pause & cancel',
+    desc: 'Senders can pause or cancel at any time. Accrued amount always protected.',
   },
   {
-    name: 'Lux Chain Set',
-    price: '75 XLM',
-    usd: '~$30',
-    tag: 'Popular',
-    color: 'bg-rose-50 dark:bg-rose-950/30',
+    icon: (
+      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+      </svg>
+    ),
+    title: 'Any Stellar token',
+    desc: 'Stream XLM, USDC, or any Stellar asset — same contract, same UX.',
   },
-]
+];
 
 const STEPS = [
-  {
-    num: '01',
-    title: 'Connect Wallet',
-    desc: 'Install Freighter and connect your Stellar wallet — no email, no password.',
-  },
-  {
-    num: '02',
-    title: 'Browse & Add to Cart',
-    desc: 'Explore thousands of premium products. Add what you love to your cart.',
-  },
-  {
-    num: '03',
-    title: 'Pay with Stellar',
-    desc: 'Sign the transaction in Freighter. Funds held in escrow until delivery.',
-  },
-  {
-    num: '04',
-    title: 'Confirm & Done',
-    desc: 'Confirm delivery to release funds to the seller. Safe, fast, on-chain.',
-  },
-]
+  { num: '01', title: 'Connect Freighter', desc: 'One-click wallet connect. No email, no password.' },
+  { num: '02', title: 'Set up a stream', desc: 'Choose recipient, deposit amount, and stream rate.' },
+  { num: '03', title: 'Sign & deploy', desc: 'Approve in Freighter. Funds locked on Soroban instantly.' },
+  { num: '04', title: 'Tokens flow', desc: 'Recipient withdraws accrued tokens anytime, in real time.' },
+];
 
-const STATS = [
-  { number: '10K+',  label: 'Products Listed' },
-  { number: '5K+',   label: 'Happy Buyers'    },
-  { number: '0%',    label: 'Platform Fees'   },
-  { number: '100%',  label: 'On-Chain'        },
-]
-
-const Home: NextPage = () => {
+export default function Home() {
   return (
     <>
       <Head>
-        <title>Birkinlabs — Shop with Stellar Tokens</title>
-        <meta
-          name="description"
-          content="Birkinlabs is a premium e-commerce marketplace on the Stellar network. Browse thousands of products and pay instantly with XLM or Stellar-based tokens."
-        />
-        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-        <link rel="icon" href="/favicon.ico" />
+        <title>LumenFlow — Streaming Payments on Stellar</title>
+        <meta name="description" content="Stream XLM and Stellar tokens per second with Soroban smart contracts. Real-time, non-custodial, unstoppable." />
       </Head>
 
-      <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-        <Navbar />
+      {/* Hero */}
+      <section className="relative overflow-hidden py-24 text-center">
+        {/* Glow blobs */}
+        <div className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 h-[500px] w-[800px] rounded-full bg-violet-600/10 blur-[120px]" />
+        <div className="pointer-events-none absolute left-1/4 top-24 h-64 w-64 rounded-full bg-cyan-500/8 blur-[80px]" />
 
-        {/* ── Hero ── */}
-        <section className="relative overflow-hidden px-6 pt-28 pb-24 text-center bg-gradient-to-b from-white via-violet-50 to-white dark:from-gray-950 dark:via-violet-950/20 dark:to-gray-950">
-          <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[700px] h-[500px] rounded-full bg-violet-400/10 blur-3xl" />
-
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-violet-50 dark:bg-violet-950 border border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400 text-xs font-bold tracking-widest uppercase mb-6">
-            ⭐ Powered by Stellar
+        <div className="relative">
+          <span className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-semibold tracking-widest text-violet-400 uppercase">
+            Built on Stellar · Soroban Smart Contracts
           </span>
 
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-none text-gray-900 dark:text-white max-w-4xl mx-auto mb-6">
-            Shop Premium.{' '}
-            <span className="text-violet-600 dark:text-violet-400">Pay with Stellar.</span>
+          <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-extrabold leading-tight tracking-tight text-white md:text-6xl lg:text-7xl">
+            Money that{' '}
+            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text text-transparent">
+              flows in real time
+            </span>
           </h1>
 
-          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-xl mx-auto mb-10 leading-relaxed">
-            Birkinlabs is a decentralized marketplace for premium goods. Browse thousands
-            of products and pay instantly with XLM or any Stellar-based token — zero platform fees, zero middlemen.
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-slate-400">
+            LumenFlow lets you stream XLM and Stellar tokens per second.
+            Pay salaries, subscriptions, and freelance work — live, on-chain, unstoppable.
           </p>
 
-          <div className="flex flex-wrap justify-center gap-4">
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-violet-500/30 transition-all hover:-translate-y-0.5"
+              href="/streams/create"
+              className="rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-7 py-3.5 text-sm font-semibold text-white shadow-xl shadow-violet-500/25 transition hover:opacity-90 hover:-translate-y-0.5 active:scale-95"
             >
-              Start Shopping →
+              Create a Stream →
             </Link>
             <Link
-              href="/sell"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 font-semibold rounded-xl border border-gray-200 dark:border-gray-700 hover:border-violet-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all hover:-translate-y-0.5"
+              href="/dashboard"
+              className="rounded-xl border border-slate-700 bg-slate-800/60 px-7 py-3.5 text-sm font-semibold text-slate-200 transition hover:bg-slate-700 hover:-translate-y-0.5"
             >
-              Sell on Birkinlabs
+              View Dashboard
             </Link>
-          </div>
-        </section>
-
-        {/* ── Stats ── */}
-        <div className="border-y border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-gray-200 dark:divide-gray-800">
-            {STATS.map((s) => (
-              <div key={s.label} className="py-8 px-6 text-center">
-                <div className="text-3xl font-extrabold text-violet-600 dark:text-violet-400 tracking-tight">
-                  {s.number}
-                </div>
-                <div className="mt-1 text-sm text-gray-500 dark:text-gray-400 font-medium">
-                  {s.label}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
-        {/* ── Categories ── */}
-        <section className="max-w-6xl mx-auto px-6 py-24">
-          <span className="text-xs font-bold tracking-widest uppercase text-violet-600 dark:text-violet-400">
-            Browse
-          </span>
-          <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            Shop by Category
-          </h2>
-          <p className="mt-3 text-lg text-gray-500 dark:text-gray-400 max-w-lg leading-relaxed">
-            Thousands of premium products across every category — all payable with Stellar tokens.
-          </p>
-
-          <div className="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-            {CATEGORIES.map((c) => (
-              <Link
-                key={c.name}
-                href={`/shop?category=${c.name.toLowerCase()}`}
-                className="group flex flex-col items-center gap-2 p-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl hover:border-violet-400 dark:hover:border-violet-600 hover:shadow-md hover:-translate-y-1 transition-all duration-200 text-center"
-              >
-                <span className="text-3xl">{c.icon}</span>
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">{c.name}</span>
-                <span className="text-xs text-gray-400">{c.count}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* ── Featured Products ── */}
-        <div className="bg-gray-50 dark:bg-gray-900 border-y border-gray-200 dark:border-gray-800">
-          <div className="max-w-6xl mx-auto px-6 py-24">
-            <span className="text-xs font-bold tracking-widest uppercase text-violet-600 dark:text-violet-400">
-              Featured
+        {/* Live demo card */}
+        <div className="relative mx-auto mt-20 max-w-sm rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-600/10 to-cyan-600/5 p-6 text-left shadow-2xl shadow-violet-500/10 glow-violet">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-400">Streaming to</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-400 ring-1 ring-emerald-500/30">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Active
             </span>
-            <div className="mt-3 flex items-end justify-between flex-wrap gap-4">
-              <h2 className="text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                Trending Now
-              </h2>
-              <Link href="/shop" className="text-sm font-semibold text-violet-600 dark:text-violet-400 hover:underline">
-                View all →
-              </Link>
-            </div>
-
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {PRODUCTS.map((p) => (
-                <div
-                  key={p.name}
-                  className="group bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-200 cursor-pointer"
-                >
-                  <div className={`h-48 ${p.color} flex items-center justify-center text-5xl`}>
-                    🛍️
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-bold text-gray-900 dark:text-white text-sm">{p.name}</h3>
-                      <span className="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400">
-                        {p.tag}
-                      </span>
-                    </div>
-                    <div className="mt-3 flex items-center justify-between">
-                      <div>
-                        <span className="text-base font-extrabold text-gray-900 dark:text-white">{p.price}</span>
-                        <span className="ml-1.5 text-xs text-gray-400">{p.usd}</span>
-                      </div>
-                      <button className="px-3 py-1.5 bg-violet-600 hover:bg-violet-700 text-white text-xs font-semibold rounded-lg transition-colors">
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        </div>
-
-        {/* ── How It Works ── */}
-        <section className="max-w-6xl mx-auto px-6 py-24">
-          <span className="text-xs font-bold tracking-widest uppercase text-violet-600 dark:text-violet-400">
-            How It Works
-          </span>
-          <h2 className="mt-3 text-4xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-            Buy in four steps
-          </h2>
-          <p className="mt-3 text-lg text-gray-500 dark:text-gray-400 max-w-xl leading-relaxed">
-            From wallet connect to doorstep delivery — the entire payment flow is on-chain, transparent, and instant.
+          <p className="mt-1 font-mono text-sm text-slate-300">GDMO...R4B2</p>
+          <p className="mt-5 text-4xl font-bold tabular-nums text-white">
+            2,481.
+            <span className="text-violet-400">39</span>
+            <span className="ml-1.5 text-xl font-normal text-slate-400">XLM</span>
           </p>
-
-          <div className="mt-14 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative">
-            <div className="hidden lg:block absolute top-8 left-[calc(12.5%+2rem)] right-[calc(12.5%+2rem)] h-0.5 bg-gradient-to-r from-violet-500 via-violet-300 to-violet-100 dark:to-violet-900" />
-            {STEPS.map((s) => (
-              <div key={s.num} className="text-center relative">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-600 text-white text-xl font-extrabold shadow-lg shadow-violet-500/30 mb-5 relative z-10">
-                  {s.num}
-                </div>
-                <h3 className="font-bold text-gray-900 dark:text-white mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">{s.desc}</p>
-              </div>
-            ))}
+          <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-slate-700">
+            <div className="h-full w-[62%] rounded-full bg-gradient-to-r from-violet-500 to-cyan-400" />
           </div>
-        </section>
-
-        {/* ── Sell Banner ── */}
-        <div className="bg-gray-50 dark:bg-gray-900 border-y border-gray-200 dark:border-gray-800">
-          <div className="max-w-6xl mx-auto px-6 py-16 flex flex-col md:flex-row items-center justify-between gap-8">
-            <div>
-              <h2 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white mb-2">
-                Got products to sell?
-              </h2>
-              <p className="text-gray-500 dark:text-gray-400 max-w-lg leading-relaxed">
-                List your products on Birkinlabs and receive payments directly in Stellar tokens.
-                No intermediary, no chargebacks, instant settlement.
-              </p>
-            </div>
-            <Link
-              href="/sell"
-              className="shrink-0 inline-flex items-center gap-2 px-7 py-3.5 bg-violet-600 hover:bg-violet-700 text-white font-semibold rounded-xl shadow-lg shadow-violet-500/20 transition-all hover:-translate-y-0.5 whitespace-nowrap"
-            >
-              Start Selling →
-            </Link>
-          </div>
+          <p className="mt-2 text-xs text-slate-500">62% streamed · 0.0115 XLM/sec</p>
         </div>
+      </section>
 
-        {/* ── CTA Banner ── */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-violet-600 to-indigo-700 px-6 py-24 text-center">
-          <div
-            className="pointer-events-none absolute inset-0 opacity-5"
-            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E\")" }}
-          />
-          <h2 className="relative text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
-            Ready to shop with Stellar?
-          </h2>
-          <p className="relative text-lg text-violet-100 max-w-md mx-auto mb-10 leading-relaxed">
-            Connect your Freighter wallet and start shopping in seconds. No credit card. No sign-up.
-          </p>
-          <div className="relative flex flex-wrap justify-center gap-4">
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-white text-violet-600 font-bold rounded-xl shadow-xl hover:-translate-y-0.5 hover:shadow-2xl transition-all"
-            >
-              Shop Now →
-            </Link>
-            <a
-              href="https://docs.birkinlabs.xyz"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-7 py-3.5 bg-transparent text-white font-semibold rounded-xl border border-white/40 hover:bg-white/10 hover:border-white hover:-translate-y-0.5 transition-all"
-            >
-              Read the Docs
-            </a>
-          </div>
-        </section>
-
-        {/* ── Footer ── */}
-        <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 px-6 pt-14 pb-8">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            <div>
-              <span className="text-xl font-extrabold text-gray-900 dark:text-white block mb-3">Birkinlabs</span>
-              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed max-w-[240px]">
-                Shop freely. Pay trustlessly. A premium marketplace powered by Stellar &amp; Soroban.
-              </p>
-            </div>
-            {[
-              {
-                title: 'Shop',
-                links: [
-                  { label: 'All Products', href: '/shop' },
-                  { label: 'Handbags', href: '/shop?category=handbags' },
-                  { label: 'Sneakers', href: '/shop?category=sneakers' },
-                  { label: 'Watches', href: '/shop?category=watches' },
-                ],
-              },
-              {
-                title: 'Sellers',
-                links: [
-                  { label: 'Start Selling', href: '/sell' },
-                  { label: 'Seller Docs', href: 'https://docs.birkinlabs.xyz', external: true },
-                  { label: 'SDK', href: 'https://github.com/Birkinlabs-Protocol/birkinlabs-sdk', external: true },
-                ],
-              },
-              {
-                title: 'Protocol',
-                links: [
-                  { label: 'GitHub', href: 'https://github.com/Birkinlabs-Protocol', external: true },
-                  { label: 'Documentation', href: 'https://docs.birkinlabs.xyz', external: true },
-                  { label: 'Issues', href: 'https://github.com/Birkinlabs-Protocol/birkinlabs-frontend/issues', external: true },
-                ],
-              },
-            ].map((col) => (
-              <div key={col.title}>
-                <div className="text-xs font-bold tracking-widest uppercase text-gray-400 dark:text-gray-500 mb-4">{col.title}</div>
-                <ul className="space-y-2.5">
-                  {col.links.map((l) => (
-                    <li key={l.label}>
-                      {'external' in l && l.external ? (
-                        <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
-                          {l.label}
-                        </a>
-                      ) : (
-                        <Link href={l.href} className="text-sm text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
-                          {l.label}
-                        </Link>
-                      )}
-                    </li>
-                  ))}
-                </ul>
+      {/* Features */}
+      <section className="py-20">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-violet-400">Why LumenFlow</p>
+        <h2 className="mt-3 text-center text-3xl font-bold text-white">Everything a payment stream needs</h2>
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="rounded-2xl border border-slate-700/60 bg-slate-800/40 p-6 transition hover:border-violet-500/30 hover:bg-slate-800/60">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500/20 to-cyan-500/10 text-violet-400 ring-1 ring-violet-500/20">
+                {f.icon}
               </div>
-            ))}
-          </div>
-          <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-wrap justify-between items-center gap-3">
-            <span className="text-xs text-gray-400 dark:text-gray-500">© 2026 Birkinlabs Protocol. MIT License.</span>
-            <span className="text-xs text-gray-400 dark:text-gray-500">⭐ Powered by Stellar &amp; Soroban</span>
-          </div>
-        </footer>
-      </div>
+              <h3 className="mt-4 font-semibold text-white">{f.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-slate-400">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="py-20">
+        <p className="text-center text-xs font-bold uppercase tracking-widest text-violet-400">How it works</p>
+        <h2 className="mt-3 text-center text-3xl font-bold text-white">Up and streaming in four steps</h2>
+        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {STEPS.map((s, i) => (
+            <div key={s.num} className="relative rounded-2xl border border-slate-700/60 bg-slate-800/40 p-6">
+              {i < STEPS.length - 1 && (
+                <div className="absolute -right-3 top-8 hidden h-px w-6 bg-gradient-to-r from-violet-500/50 to-transparent lg:block" />
+              )}
+              <span className="text-3xl font-black text-violet-500/30">{s.num}</span>
+              <h3 className="mt-2 font-semibold text-white">{s.title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-400">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="relative overflow-hidden rounded-3xl border border-violet-500/20 bg-gradient-to-br from-violet-600/15 to-cyan-600/10 px-8 py-16 text-center glow-violet mb-4">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-violet-600/5 to-transparent" />
+        <h2 className="relative text-3xl font-bold text-white">Ready to stream?</h2>
+        <p className="relative mt-3 text-slate-400">Connect Freighter and create your first stream in under a minute.</p>
+        <Link
+          href="/streams/create"
+          className="relative mt-8 inline-flex rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 px-8 py-3.5 text-sm font-semibold text-white shadow-xl shadow-violet-500/25 transition hover:opacity-90 hover:-translate-y-0.5"
+        >
+          Get Started →
+        </Link>
+      </section>
     </>
-  )
+  );
 }
-
-export default Home

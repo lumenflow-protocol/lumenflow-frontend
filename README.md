@@ -1,111 +1,125 @@
-# 🛍️ Birkinlabs Frontend
+# lumenflow-frontend
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Next.js](https://img.shields.io/badge/Next.js-13-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8)](https://tailwindcss.com/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-06B6D4)](https://tailwindcss.com/)
 
-> **The premium e-commerce storefront for the Birkinlabs Protocol — shop and pay with Stellar tokens.**
-
-Birkinlabs Frontend is the Next.js storefront powering the Birkinlabs shopping experience. Browse curated products, manage your cart, and check out seamlessly using Stellar (XLM) or any Stellar-based token — all without a credit card.
+> Next.js dApp for LumenFlow — create payment streams, track live balances, and manage withdrawals on Stellar.
 
 ---
 
-## ✨ Core Features
+## Pages
 
-- 🔗 **Stellar Wallet Connect**: One-click Freighter wallet integration for instant token payments.
-- 🛒 **Product Catalog**: Browsable, filterable product grid with real-time inventory.
-- 💳 **Stellar Checkout**: Pay with XLM or Stellar-based tokens — zero platform fees.
-- 🌗 **Dark / Light Mode**: System-aware theme with smooth toggling.
-- 🔔 **Live Notifications**: Toast alerts for cart updates, payment confirmations, and order status.
-- 📱 **Fully Responsive**: Mobile-first design across all screen sizes.
+| Route | Description |
+|---|---|
+| `/` | Landing page — hero, features, how-it-works |
+| `/dashboard` | Your sending and receiving streams with live balance countdown |
+| `/streams/create` | Create a new payment stream |
+| `/streams/[id]` | Stream detail — balance hero, withdraw, pause, cancel, resume |
 
 ---
 
-## 🗂️ Project Structure
+## Project structure
 
 ```
-├── pages/
-│   ├── _app.tsx            # App shell — providers, global styles
-│   └── index.tsx           # Storefront landing page
-├── components/
-│   ├── atoms/              # Button, Card, Input, Toast, ThemeToggle, ProgressBar
-│   ├── molecules/          # ProductCard, CartItem, CheckoutForm, WalletData
-│   └── organisms/          # Navbar, ProductGrid, CartDrawer, CheckoutModal
-├── hooks/
-│   ├── useAccount.ts       # Stellar wallet account state
-│   ├── useCart.ts          # Cart state management
-│   ├── useTheme.ts         # Dark/light theme
-│   └── useToast.ts         # Notification queue
-├── shared/
-│   ├── contracts.ts        # Stellar contract bindings
-│   └── utils.ts            # Shared utilities
-└── styles/
-    └── globals.css         # Tailwind base + theme variables
+components/
+├── atoms/
+│   ├── badge/          — StreamStatus badge (Active, Paused, Cancelled, Completed)
+│   ├── button/         — Base button
+│   ├── card/           — Base card
+│   ├── connect-button/ — Freighter wallet connect
+│   └── loading/        — Spinner
+├── molecules/
+│   ├── StreamCard/         — Stream summary card with live balance bar
+│   ├── StreamDetail/       — Full stream view with action buttons
+│   ├── CreateStreamForm/   — Form to create a stream
+│   └── transaction-modal/  — Tx pending / success / error modal
+└── organisms/
+    ├── navbar/         — Top navigation with wallet connect
+    └── StreamList/     — Responsive grid of StreamCards
+
+hooks/
+├── useWallet.ts          — Freighter connect + sign
+├── useStream.ts          — Fetch stream(s) from backend API
+├── useStreamBalance.ts   — Real-time balance computed client-side every second
+├── useIsMounted.ts       — SSR-safe mount check
+└── useToast.ts           — Toast notification state
+
+lib/
+├── contract.ts     — Soroban contract invocation (all 5 functions)
+├── api.ts          — Backend REST client
+└── constants.ts    — Env var config
 ```
 
 ---
 
-## 🚀 Getting Started
+## Design
+
+- **Colors:** Violet (`#8B5CF6`) + Cyan (`#06B6D4`) on near-black (`#08090e`)
+- **Buttons:** Gradient `violet → cyan` with glow shadow
+- **Cards:** Dark glass with subtle border and hover lift
+- **Balance:** Updates every second client-side using rate × elapsed calculation — no blockchain call needed
+
+---
+
+## Getting started
 
 ### Prerequisites
-- Node.js >= 18
-- [Freighter Wallet](https://www.freighter.app/) browser extension
 
-### Installation
+- Node.js >= 18 + pnpm
+- [Freighter](https://freighter.app) browser extension
+- A running `lumenflow-backend` instance
 
-```bash
-npm install
-```
-
-### Environment Setup
+### Setup
 
 ```bash
-cp .env.example .env
+pnpm install
+cp .env.example .env.local    # fill in contract ID and API URL
+pnpm dev
 ```
 
-```env
-NEXT_PUBLIC_STELLAR_NETWORK=TESTNET
-NEXT_PUBLIC_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org
-NEXT_PUBLIC_PAYMENT_CONTRACT_ID=your-contract-id
-```
+Open [http://localhost:3000](http://localhost:3000).
 
-### Running
+### Environment variables
+
+| Variable | Description | Default |
+|---|---|---|
+| `NEXT_PUBLIC_SOROBAN_RPC_URL` | Soroban RPC endpoint | `https://soroban-testnet.stellar.org` |
+| `NEXT_PUBLIC_STREAM_CONTRACT_ID` | Deployed stream contract address | — |
+| `NEXT_PUBLIC_API_URL` | Backend API base URL | `http://localhost:3001/api/v1` |
+| `NEXT_PUBLIC_NETWORK` | `testnet` or `mainnet` | `testnet` |
+| `NEXT_PUBLIC_USDC_CONTRACT_ID` | USDC contract ID (optional) | — |
+
+### Build for production
 
 ```bash
-npm run dev
+pnpm build
+pnpm start
 ```
 
 ---
 
-## 🛡️ Security
+## How the balance counter works
 
-- No private keys ever touch the browser — all signing delegated to Freighter.
-- All payment amounts validated against live contract state before submission.
-- Environment variables never logged or exposed in client bundles.
+The frontend computes the withdrawable balance **client-side** every second without polling the blockchain:
 
----
+```
+now           = current unix timestamp
+effective_end = min(now, stop_time)
+elapsed       = effective_end - start_time  (+ banked seconds if previously paused)
+streamed      = min(elapsed × rate_per_second, deposit)
+available     = streamed - withdrawn
+```
 
-## 🗺️ Roadmap
-
-- [ ] **Product Detail Pages**: Full product view with images, specs, and reviews.
-- [ ] **Order History**: On-chain purchase history tied to wallet address.
-- [ ] **Multi-Token Checkout**: Pay with USDC, XLM, or any Stellar-based asset.
-- [ ] **Seller Dashboard**: Upload and manage product listings on-chain.
-
----
-
-## 🤝 Community & Support
-
-- **Docs**: [docs.birkinlabs.xyz](https://docs.birkinlabs.xyz)
-- **Issues**: [birkinlabs-frontend/issues](https://github.com/Birkinlabs-Protocol/birkinlabs-frontend/issues)
+This gives a smooth, real-time counter at zero blockchain cost.
 
 ---
 
-*Shop freely. Pay trustlessly.*
+## Contributing
 
----
+See the root [CONTRIBUTING.md](../CONTRIBUTING.md).
 
-## 📜 License
+## License
 
-MIT License. Copyright (c) 2026 Birkinlabs Protocol.
+MIT License — Copyright (c) 2026 LumenFlow Protocol.
