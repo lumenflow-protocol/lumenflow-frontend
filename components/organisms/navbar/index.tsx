@@ -1,100 +1,84 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ThemeToggle } from '../../atoms/theme-toggle';
-import { Logo } from '../../atoms/logo';
+import { ConnectButton } from '../../atoms/connect-button';
 
 const NAV_LINKS = [
-  { label: 'Home',      href: '/'          },
-  { label: 'Explore',   href: '/explore'   },
   { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Escrow',    href: '/escrow'    },
+  { label: 'Create Stream', href: '/streams/create' },
 ];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const router = useRouter();
 
-  const toggle = () => setOpen((v) => !v);
-  const close  = () => setOpen(false);
-
   return (
-    <nav className="sticky top-0 z-50 flex items-center justify-between px-6 h-16 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-sm">
-      {/* Brand */}
-      <Link href="/" onClick={close} className="flex items-center hover:opacity-80 transition-opacity">
-        <Logo size="md" showText={true} />
-      </Link>
+    <nav className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/80 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+        {/* Brand */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-cyan-400 shadow-lg shadow-violet-500/30 transition group-hover:shadow-violet-500/50">
+            <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <span className="text-base font-bold tracking-tight text-white">LumenFlow</span>
+        </Link>
 
-      {/* Desktop links */}
-      <ul className="hidden md:flex items-center gap-1 list-none m-0 p-0">
-        {NAV_LINKS.map(({ label, href }) => (
-          <li key={href}>
+        {/* Desktop links */}
+        <div className="hidden items-center gap-1 md:flex">
+          {NAV_LINKS.map(({ label, href }) => (
             <Link
+              key={href}
               href={href}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                 router.pathname === href
-                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold'
-                  : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                  ? 'bg-slate-800 text-white'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-white'
               }`}
             >
               {label}
             </Link>
-          </li>
-        ))}
-      </ul>
+          ))}
+        </div>
 
-      {/* Right actions */}
-      <div className="hidden md:flex items-center gap-3">
-        <ThemeToggle />
-        <Link
-          href="/escrow"
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-all hover:-translate-y-px"
+        <div className="hidden items-center gap-3 md:flex">
+          <ConnectButton />
+        </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="flex flex-col gap-1.5 p-1 md:hidden"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Toggle menu"
         >
-          Launch App
-        </Link>
+          <span className="block h-0.5 w-5 rounded bg-slate-400 transition-all" />
+          <span className="block h-0.5 w-5 rounded bg-slate-400 transition-all" />
+          <span className="block h-0.5 w-5 rounded bg-slate-400 transition-all" />
+        </button>
       </div>
-
-      {/* Hamburger */}
-      <button
-        className="flex md:hidden flex-col gap-1.5 bg-transparent border-none cursor-pointer p-1"
-        onClick={toggle}
-        aria-expanded={open}
-        aria-label={open ? 'Close menu' : 'Open menu'}
-      >
-        <span className="block w-5 h-0.5 bg-gray-900 dark:bg-white rounded transition-all" />
-        <span className="block w-5 h-0.5 bg-gray-900 dark:bg-white rounded transition-all" />
-        <span className="block w-5 h-0.5 bg-gray-900 dark:bg-white rounded transition-all" />
-      </button>
 
       {/* Mobile drawer */}
       {open && (
-        <div className="absolute top-16 left-0 right-0 bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800 shadow-lg px-6 py-4 animate-[slideDown_0.18s_ease-out]">
-          <ul className="list-none m-0 p-0 flex flex-col gap-1">
+        <div className="border-t border-slate-800 bg-slate-950 px-6 py-4 md:hidden">
+          <div className="flex flex-col gap-1">
             {NAV_LINKS.map(({ label, href }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  onClick={close}
-                  className={`block px-3 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                    router.pathname === href
-                      ? 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white font-semibold'
-                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {label}
-                </Link>
-              </li>
+              <Link
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className={`rounded-lg px-3 py-2.5 text-sm font-medium ${
+                  router.pathname === href
+                    ? 'bg-slate-800 text-white'
+                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                {label}
+              </Link>
             ))}
-          </ul>
-          <div className="mt-3 flex items-center gap-3 pt-3 border-t border-gray-100 dark:border-gray-800">
-            <ThemeToggle />
-            <Link
-              href="/escrow"
-              onClick={close}
-              className="flex-1 text-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg transition-colors"
-            >
-              Launch App
-            </Link>
+          </div>
+          <div className="mt-4 border-t border-slate-800 pt-4">
+            <ConnectButton />
           </div>
         </div>
       )}
