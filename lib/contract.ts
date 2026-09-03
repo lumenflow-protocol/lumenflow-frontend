@@ -47,6 +47,8 @@ export const contract = {
     deposit: bigint,
     ratePerSecond: bigint,
     duration: bigint,
+    cliffTime: bigint,
+    title: string,
     sign: SignFn,
   ) =>
     invoke(
@@ -58,6 +60,8 @@ export const contract = {
         nativeToScVal(deposit, { type: 'i128' }),
         nativeToScVal(ratePerSecond, { type: 'i128' }),
         nativeToScVal(duration, { type: 'u64' }),
+        nativeToScVal(cliffTime, { type: 'u64' }),
+        nativeToScVal(title || '', { type: 'string' }),
       ],
       sender,
       sign,
@@ -71,6 +75,35 @@ export const contract = {
         Address.fromString(recipient).toScVal(),
       ],
       recipient,
+      sign,
+    ),
+
+  depositMore: (streamId: bigint, amount: bigint, sender: string, sign: SignFn) =>
+    invoke(
+      'deposit_more',
+      [
+        nativeToScVal(streamId, { type: 'u64' }),
+        Address.fromString(sender).toScVal(),
+        nativeToScVal(amount, { type: 'i128' }),
+      ],
+      sender,
+      sign,
+    ),
+
+  transferRecipient: (
+    streamId: bigint,
+    newRecipient: string,
+    currentRecipient: string,
+    sign: SignFn,
+  ) =>
+    invoke(
+      'transfer_recipient',
+      [
+        nativeToScVal(streamId, { type: 'u64' }),
+        Address.fromString(currentRecipient).toScVal(),
+        Address.fromString(newRecipient).toScVal(),
+      ],
+      currentRecipient,
       sign,
     ),
 

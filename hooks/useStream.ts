@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { api, Stream } from '../lib/api';
+import { useEffect, useState, useCallback } from 'react';
+import { api, Stream, StreamEvent, AddressStats } from '../lib/api';
 
 export function useStream(id: string | undefined) {
   const [stream, setStream] = useState<Stream | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchStream = useCallback(() => {
     if (!id) return;
     setLoading(true);
     api.getStream(id)
@@ -15,40 +15,89 @@ export function useStream(id: string | undefined) {
       .finally(() => setLoading(false));
   }, [id]);
 
-  const refetch = () => {
+  useEffect(() => {
+    fetchStream();
+  }, [fetchStream]);
+
+  return { stream, loading, error, refetch: fetchStream };
+}
+
+export function useStreamEvents(id: string | undefined) {
+  const [events, setEvents] = useState<StreamEvent[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchEvents = useCallback(() => {
     if (!id) return;
-    api.getStream(id).then(setStream).catch(() => {});
-  };
+    setLoading(true);
+    api.getStreamEvents(id)
+      .then(setEvents)
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
+  }, [id]);
 
-  return { stream, loading, error, refetch };
+  useEffect(() => {
+    fetchEvents();
+  }, [fetchEvents]);
+
+  return { events, loading, refetchEvents: fetchEvents };
 }
 
-export function useStreamsBySender(address: string | null) {
+export function useStreamsBySender(
+  address: string | null,
+  params?: { status?: string; search?: string },
+) {
   const [streams, setStreams] = useState<Stream[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchStreams = useCallback(() => {
+    if (!address) return;
+    setLoading(true);
+    api.getStreamsBySender(address, params)
+      .then(setStreams)
+      .finally(() => setLoading(false));
+  }, [address, params?.status, params?.search]);
+
+  useEffect(() => {
+    fetchStreams();
+  }, [fetchStreams]);
+
+  return { streams, loading, refetch: fetchStreams };
+}
+
+export function useStreamsByRecipient(
+  address: string | null,
+  params?: { status?: string; search?: string },
+) {
+  const [streams, setStreams] = useState<Stream[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchStreams = useCallback(() => {
+    if (!address) return;
+    setLoading(true);
+    api.getStreamsByRecipient(address, params)
+      .then(setStreams)
+      .finally(() => setLoading(false));
+  }, [address, params?.status, params?.search]);
+
+  useEffect(() => {
+    fetchStreams();
+  }, [fetchStreams]);
+
+  return { streams, loading, refetch: fetchStreams };
+}
+
+export function useAddressStats(address: string | null) {
+  const [stats, setStats] = useState<AddressStats | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!address) return;
     setLoading(true);
-    api.getStreamsBySender(address)
-      .then(setStreams)
+    api.getAddressStats(address)
+      .then(setStats)
+      .catch(() => setStats(null))
       .finally(() => setLoading(false));
   }, [address]);
 
-  return { streams, loading };
-}
-
-export function useStreamsByRecipient(address: string | null) {
-  const [streams, setStreams] = useState<Stream[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!address) return;
-    setLoading(true);
-    api.getStreamsByRecipient(address)
-      .then(setStreams)
-      .finally(() => setLoading(false));
-  }, [address]);
-
-  return { streams, loading };
+  return { stats, loading };
 }
